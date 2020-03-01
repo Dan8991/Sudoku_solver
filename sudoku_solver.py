@@ -149,9 +149,10 @@ def str_label(val):
 
 class Sudoku_gi():
 
-    def __init__(self, sudoku):
+    def __init__(self):
         self.root = tk.Tk()
-        self.sudoku = sudoku
+        self.root.title("Sudoku Solver")
+        self.sudoku = np.zeros((9, 9)) 
         frames = [[] for i in range(3)]
 
         for i in range(3):
@@ -163,17 +164,22 @@ class Sudoku_gi():
 
         for i in range(9):
             for j in range(9):
-                labels[i].append(tk.Label(frames[i//3][j//3], text = str_label(sudoku[i, j]), height=2, width=5, bd=3))
+                labels[i].append(tk.Label(frames[i//3][j//3], text = str_label(self.sudoku[i, j]), bg="white", height=2, width=5, bd=3))
                 labels[i][j].grid(row = i%3, column = j%3)
 
         self.labels = labels
-        tk.Button(self.root, text="Start", command=self.execute_sudoku).grid(row=3, column = 2)
+        tk.Button(self.root, text="Create Game", command=self.generate_sudoku_game, width = 15, background="Green", activebackground="LightGreen").grid(row = 3, column=0)
+        tk.Button(self.root, text="Start", command=self.execute_sudoku, width = 15, background="Green", activebackground="LightGreen").grid(row=3, column = 2)
         self.root.mainloop()
 
     def execute_sudoku(self):
         back_track_solver(self.sudoku, root = self.root, tk_cells=self.labels)
 
-print("Generating a new game")
-game = generate_sudoku_game()
-sudoku = Sudoku_gi(game)
+    def generate_sudoku_game(self):
+        print("Generating a new game")
+        self.sudoku = generate_sudoku_game()
+        for i in range(9):
+            for j in range(9):
+                self.labels[i][j].config(text = str_label(self.sudoku[i][j]))
 
+Sudoku_gi()
