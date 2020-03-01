@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm import tqdm
 
 #returns the horizonatal and vertical line containing the current cell
 def get_lines(sudoku, x, y):
@@ -90,6 +91,7 @@ def find_some_solutions(sudoku, index=0):
             number_of_solutions += find_some_solutions(sudoku, index + 1) 
 
             if number_of_solutions >= 2:
+                sudoku[i, j] = 0
                 return number_of_solutions
 
             #needed because otherwise when backtracking the first if would be triggered even if this is an invalid solution
@@ -98,12 +100,29 @@ def find_some_solutions(sudoku, index=0):
         #if two solutions were not found yet then backtrack 
         return number_of_solutions 
 
-# def generate_sudoku_game():
+def generate_sudoku_game():
+    
+    sudoku = back_track_solver(np.zeros((9, 9)))
 
-            
-sudoku = np.zeros((9,9)) 
-good_solution = back_track_solver(sudoku)
-good_solution[8, 8] = 0
-print(has_more_than_one_solution(sudoku))
-sudoku = np.zeros((9,9)) 
-print(has_more_than_one_solution(sudoku))
+    #list of indexes 
+    removing_indexes = np.random.permutation(list(range(81)))
+    #used for indexing
+    unused = 0
+
+    for index in tqdm(removing_indexes):
+
+        # pylint: disable=unbalanced-tuple-unpacking
+        i, j = np.unravel_index(index, sudoku.shape)
+
+        temp = sudoku[i, j]
+        sudoku[i, j] = 0
+        
+        #if there is just one solution go to the next step and remove the current index from the list
+        if has_more_than_one_solution(sudoku):
+            sudoku[i, j] = temp
+            unused += 1
+
+    print(unused)
+    return sudoku
+        
+print(generate_sudoku_game())
