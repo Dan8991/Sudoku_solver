@@ -14,7 +14,7 @@ def get_sub_grid(sudoku, x, y):
 
     return sudoku[i:(i + 3), j:(j + 3)]
 
-def back_track_solver(sudoku, index = 0, randomized = True):
+def back_track_solver(sudoku, root = None, tk_cells=None, index = 0, randomized = True):
     
     #base case if the index is greater than the dimension of a sudoku
     if index > 80:
@@ -25,7 +25,7 @@ def back_track_solver(sudoku, index = 0, randomized = True):
     
     #if the current value is fixed go on to the next one
     if sudoku[i, j] != 0:
-        return back_track_solver(sudoku, index = index + 1)
+        return back_track_solver(sudoku, root, tk_cells, index = index + 1)
     else:
         #getting all the invalid values 
         grid = get_sub_grid(sudoku, i, j)
@@ -38,12 +38,21 @@ def back_track_solver(sudoku, index = 0, randomized = True):
         #if no value can be placed in the current cell then this is an invalid solution
         if len(possible_values) == 0:
             return sudoku
+        
+        if randomized:
+            possible_values = np.random.permutation(possible_values)
     
-        for value in np.random.permutation(possible_values):
+        for value in possible_values:
 
             #try to solve the sudoku using the current value
-            sudoku[i, j] = value
-            solution = back_track_solver(sudoku, index + 1) 
+            sudoku[i, j] = value 
+
+            if tk_cells is not None and root is not None:
+                tk_cells[i][j].config(text = str_label(value))
+                time.sleep(0.05)
+                root.update()
+
+            solution = back_track_solver(sudoku, root, tk_cells, index + 1) 
 
             #if the solution is complete return it
             if solution[8, 8] != 0:
@@ -51,6 +60,11 @@ def back_track_solver(sudoku, index = 0, randomized = True):
             
             #needed because otherwise when backtracking the first if would be triggered even if this is an invalid solution
             sudoku[i, j] = 0
+            if tk_cells is not None and root is not None:
+                tk_cells[i][j].config(text = str_label(0))
+                time.sleep(0.05)
+                root.update()
+
 
         #if no valid solution was found backtrack
         return sudoku
@@ -86,7 +100,7 @@ def find_some_solutions(sudoku, index=0):
         #if no value can be placed in the current cell then this is an invalid solution
         if len(possible_values) == 0:
             return 0 
-    
+
         for value in possible_values:
             sudoku[i, j] = value
 
@@ -126,10 +140,18 @@ def generate_sudoku_game():
 
     return sudoku
 
+def str_label(val):
+
+    if val == 0:
+        return " "
+
+    return str(val)
+
 class Sudoku_gi():
 
     def __init__(self, sudoku):
         self.root = tk.Tk()
+        self.sudoku = sudoku
         frames = [[] for i in range(3)]
 
         for i in range(3):
@@ -141,7 +163,7 @@ class Sudoku_gi():
 
         for i in range(9):
             for j in range(9):
-                labels[i].append(tk.Label(frames[i//3][j//3], text = str(sudoku[i, j]), height=2, width=5, bd=3))
+                labels[i].append(tk.Label(frames[i//3][j//3], text = str_label(sudoku[i, j]), height=2, width=5, bd=3))
                 labels[i][j].grid(row = i%3, column = j%3)
 
         self.labels = labels
@@ -149,12 +171,9 @@ class Sudoku_gi():
         self.root.mainloop()
 
     def execute_sudoku(self):
-        for row in range(9):
-            for col in range(9):
-                self.labels[row][col].config(text = str(0))
-                time.sleep(0.1)
-                self.root.update()
+        back_track_solver(self.sudoku, root = self.root, tk_cells=self.labels)
 
-game = np.arange(81).reshape((9,9))
+print("Generating a new game")
+game = generate_sudoku_game()
 sudoku = Sudoku_gi(game)
 
