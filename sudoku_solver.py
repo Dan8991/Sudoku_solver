@@ -1,5 +1,7 @@
 import numpy as np
 from tqdm import tqdm
+import tkinter as tk
+import time
 
 #returns the horizonatal and vertical line containing the current cell
 def get_lines(sudoku, x, y):
@@ -102,7 +104,7 @@ def find_some_solutions(sudoku, index=0):
 
 def generate_sudoku_game():
     
-    sudoku = back_track_solver(np.zeros((9, 9)))
+    sudoku = back_track_solver(np.zeros((9, 9), dtype = np.int))
 
     #list of indexes 
     removing_indexes = np.random.permutation(list(range(81)))
@@ -122,7 +124,37 @@ def generate_sudoku_game():
             sudoku[i, j] = temp
             unused += 1
 
-    print(unused)
     return sudoku
-        
-print(generate_sudoku_game())
+
+class Sudoku_gi():
+
+    def __init__(self, sudoku):
+        self.root = tk.Tk()
+        frames = [[] for i in range(3)]
+
+        for i in range(3):
+            for j in range(3):
+                frames[i].append(tk.Frame(self.root, bg="white", highlightcolor="black", highlightthickness=1, highlightbackground="black" ))
+                frames[i][j].grid(row=i, column=j)
+
+        labels = [[] for i in range(9)]
+
+        for i in range(9):
+            for j in range(9):
+                labels[i].append(tk.Label(frames[i//3][j//3], text = str(sudoku[i, j]), height=2, width=5, bd=3))
+                labels[i][j].grid(row = i%3, column = j%3)
+
+        self.labels = labels
+        tk.Button(self.root, text="Start", command=self.execute_sudoku).grid(row=3, column = 2)
+        self.root.mainloop()
+
+    def execute_sudoku(self):
+        for row in range(9):
+            for col in range(9):
+                self.labels[row][col].config(text = str(0))
+                time.sleep(0.1)
+                self.root.update()
+
+game = np.arange(81).reshape((9,9))
+sudoku = Sudoku_gi(game)
+
