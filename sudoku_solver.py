@@ -11,7 +11,7 @@ def get_sub_grid(sudoku, x, y):
 
     return sudoku[i:(i + 3), j:(j + 3)]
 
-def back_track_solver(sudoku, index = 0):
+def back_track_solver(sudoku, index = 0, randomized = True):
     
     #base case if the index is greater than the dimension of a sudoku
     if index > 80:
@@ -30,13 +30,13 @@ def back_track_solver(sudoku, index = 0):
         current_values = set(grid.reshape(-1)).union(set(hor)).union(set(vert))
 
         #selecting the values that can be chosen
-        possible_values = set(range(10)) - current_values
+        possible_values = list(set(range(10)) - current_values)
 
         #if no value can be placed in the current cell then this is an invalid solution
         if len(possible_values) == 0:
             return sudoku
     
-        for value in possible_values:
+        for value in np.random.permutation(possible_values):
 
             #try to solve the sudoku using the current value
             sudoku[i, j] = value
@@ -98,6 +98,7 @@ def find_some_solutions(sudoku, index=0):
         #if two solutions were not found yet then backtrack 
         return number_of_solutions 
 
+# def generate_sudoku_game():
 
             
 sudoku = np.zeros((9,9)) 
