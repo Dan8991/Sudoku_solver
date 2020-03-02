@@ -179,7 +179,8 @@ class Sudoku_gi():
         self.sudoku = generate_sudoku_game()
         for i in range(9):
             for j in range(9):
-                self.labels[i][j].config(text = str_label(self.sudoku[i][j]))
+                if self.sudoku[i][j] != 0:
+                    self.labels[i][j].config(foreground = "red", text = str_label(self.sudoku[i][j]))
         self.root.update()
 
 Sudoku_gi()
