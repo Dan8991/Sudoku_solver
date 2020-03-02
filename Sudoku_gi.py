@@ -11,6 +11,9 @@ class Sudoku_gi():
         self.root = tk.Tk()
         self.root.title("Sudoku Solver")
 
+        #variable used to stop buttons from working if some calculation is being made
+        self.is_working = False
+
         #sudoku game represented by the gui
         self.sudoku = np.zeros((9, 9)) 
         
@@ -64,7 +67,7 @@ class Sudoku_gi():
                 text = "Create Game", 
                 command = self.generate_sudoku_game, 
                 width = 15, 
-                background =" Green", 
+                background = "Green", 
                 activebackground = "LightGreen"
         ).grid(row = 3, column = 0)
 
@@ -82,18 +85,29 @@ class Sudoku_gi():
         self.root.mainloop()
 
     def execute_sudoku(self):
-        back_track_solver(self.sudoku, root = self.root, tk_cells=self.labels)
+
+        if not self.is_working:
+
+            self.is_working = True
+            back_track_solver(self.sudoku, root = self.root, tk_cells=self.labels)
+            self.is_working = False
 
     def generate_sudoku_game(self):
-        print("Generating a new game")
-        self.sudoku = generate_sudoku_game()
 
-        #updating labels by considering the new sudkoku
-        for i in range(9):
-            for j in range(9):
-                self.labels[i][j].config(text = str_label(self.sudoku[i][j]))
-                if self.sudoku[i][j] != 0:
-                    self.labels[i][j].config(foreground = "red")
-        self.root.update()
+        if not self.is_working:
 
+            self.is_working = True
+
+            print("Generating a new game")
+            self.sudoku = generate_sudoku_game()
+
+            #updating labels by considering the new sudkoku
+            for i in range(9):
+                for j in range(9):
+                    self.labels[i][j].config(text = str_label(self.sudoku[i][j]))
+                    if self.sudoku[i][j] != 0:
+                        self.labels[i][j].config(foreground = "red")
+            self.root.update()
+            
+            self.is_working = False
 
