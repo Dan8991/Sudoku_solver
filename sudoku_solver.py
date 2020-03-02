@@ -55,7 +55,7 @@ def back_track_solver(sudoku, root = None, tk_cells=None, index = 0, randomized 
             solution = back_track_solver(sudoku, root, tk_cells, index + 1) 
 
             #if the solution is complete return it
-            if solution[8, 8] != 0:
+            if np.sum(sudoku == 0) == 0:
                 return solution
             
             #needed because otherwise when backtracking the first if would be triggered even if this is an invalid solution
@@ -109,7 +109,6 @@ def find_some_solutions(sudoku, index=0):
             if number_of_solutions >= 2:
                 sudoku[i, j] = 0
                 return number_of_solutions
-
             #needed because otherwise when backtracking the first if would be triggered even if this is an invalid solution
             sudoku[i, j] = 0
 
@@ -181,5 +180,6 @@ class Sudoku_gi():
         for i in range(9):
             for j in range(9):
                 self.labels[i][j].config(text = str_label(self.sudoku[i][j]))
+        self.root.update()
 
 Sudoku_gi()
